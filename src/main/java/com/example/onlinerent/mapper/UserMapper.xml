@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.onlinerent.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.onlinerent.model.User">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="CHAR"/>
+        <result property="telephone" column="telephone" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="userface" column="userface" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="enabled" column="enabled" jdbcType="TINYINT"/>
+    </resultMap>
+    <insert id="addUser">
+        insert into user (name,phone,telephone,address,username,password,userface,remark,enabled)
+        values (#{name},#{phone},#{telephone},#{address},#{username},concat("{noop}",#{password}),#{userface},#{remark},#{enabled});
+    </insert>
+    <update id="updateUser">
+        update user
+        <set>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="phone!=null and phone!=''">
+                phone=#{phone},
+            </if>
+            <if test="telephone!=null and telephone!=''">
+                telephone=#{telephone},
+            </if>
+            <if test="address!=null and address!=''">
+                address=#{address},
+            </if>
+            <if test="username!=null and username!=''">
+                username=#{username},
+            </if>
+            <if test="password!=null and password!=''">
+                password=concat("{noop}",#{password}),
+            </if>
+            <if test="userface!=null and userface!=''">
+                userface=#{userface},
+            </if>
+            <if test="remark!=null and remark!=''">
+                remark=#{remark},
+            </if>
+        </set>
+        where id=#{id} and enabled=true
+    </update>
+    <select id="loadUserByUsername"
+            resultType="com.example.onlinerent.model.User">
+        select *
+        from user
+        where username = #{username};
+    </select>
+    <select id="getTotal" resultType="java.lang.Integer">
+        select count(*)
+        from user where enabled=true
+        <if test="name!=null and name!=''">
+            and name like concat('%',#{name},'%')
+        </if>
+    </select>
+    <select id="getUserByPage" resultMap="BaseResultMap">
+        select *
+        from user where enabled=true
+        <if test="name!=null and name!=''">
+            and name like concat('%',#{name},'%')
+        </if>
+        limit #{offset},#{size}
+    </select>
+    <select id="getUserById" resultMap="BaseResultMap">
+        select *
+        from user
+        where id = #{id} and enabled=true;
+    </select>
+    <select id="getUserByUserName" resultMap="BaseResultMap">
+        select *
+        from user
+        where username = #{username};
+    </select>
+    <delete id="deleteUserById">
+        update user
+        set enabled=false
+        where id=#{id};
+    </delete>
+</mapper>
